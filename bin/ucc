@@ -1,0 +1,2 @@
+require "ucc"
+Ucc::Runner.new("gcc")
