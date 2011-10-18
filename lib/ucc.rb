@@ -3,6 +3,7 @@ require "optparse"
 
 module Ucc
   WINDOWS = !!((`uname` rescue "") =~ /^$|windows/)
+  CURRENT_EXECUTABLE = File.basename($0)
 
   class Runner
     attr_reader :source_files
@@ -14,9 +15,12 @@ module Ucc
       work
     end
     
+    # Variables
+    # =========
+    
     def optparse
       @optparse ||= OptionParser.new do |opts|
-        opts.banner = "Usage: #{$0} [options] file..."
+        opts.banner = "Usage: #{CURRENT_EXECUTABLE} [options] file..."
         
         options[:runopts] = nil
         opts.on( '-r', '--runopts "STRING"', 'Pass STRING as the command line arguments to the app' ) do |s|
@@ -44,6 +48,15 @@ module Ucc
       @options ||= {}
     end
     
+    def app_filename
+      return @app_filename if @app_filename
+      @app_filename = source_files[0].sub(/\.\w+$/, '')
+      @app_filename += ".exe" if WINDOWS
+    end
+    
+    # Main logic
+    # ==========
+    
     def parse_options
       optparse.parse!
       
@@ -51,15 +64,9 @@ module Ucc
       @source_files = ARGV
       if @source_files.empty?
         #puts optparse
-        puts "#{$0}: no input files"
+        puts "#{CURRENT_EXECUTABLE}: no input files"
         exit(1)
       end
-    end
-    
-    def app_filename
-      return @app_filename if @app_filename
-      @app_filename = source_files[0].sub(/\.\w+$/, '')
-      @app_filename += ".exe" if WINDOWS
     end
     
     def work
