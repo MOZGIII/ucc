@@ -33,7 +33,7 @@ module Ucc
         end
         
         opts.on( '-v', '--version', 'Show app version' ) do
-          puts "#{__FILE__} #{VERSION}"
+          puts "#{CURRENT_EXECUTABLE} #{VERSION}"
           exit
         end
         
