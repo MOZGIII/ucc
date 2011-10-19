@@ -23,8 +23,13 @@ module Ucc
         opts.banner = "Usage: #{CURRENT_EXECUTABLE} [options] file..."
         
         options[:runopts] = nil
-        opts.on( '-r', '--runopts "STRING"', 'Pass STRING as the command line arguments to the app' ) do |s|
+        opts.on( '-r', '--runopts "STRING"', 'Pass STRING as the command line argument to the compiled app' ) do |s|
           options[:runopts] = s
+        end
+        
+        options[:compileopts] = nil
+        opts.on( '-c', '--compileopts "STRING"', 'Pass STRING as the command line argument to the compiler' ) do |s|
+          options[:compileopts] = s
         end
         
         options[:memcheck] = false
@@ -58,7 +63,12 @@ module Ucc
     # ==========
     
     def parse_options
-      optparse.parse!
+      begin
+        optparse.parse!
+      rescue OptionParser::InvalidOption=> e
+        puts "#{CURRENT_EXECUTABLE}: #{e}"
+        exit(1)
+      end      
       
       # Here we have already parsed ARGV
       @source_files = ARGV
@@ -70,7 +80,9 @@ module Ucc
     end
     
     def work
-      exit unless system(%Q[#{@compiler} -Wall -o "#{app_filename}" #{source_files.map{ |f| '"'+f+'"' }.join(" ")}])
+      compilation_params = %Q[#{@compiler} -Wall -o "#{app_filename}" #{source_files.map{ |f| '"'+f+'"' }.join(" ")}]
+      compilation_params = "#{compilation_params} #{options[:compileopts]}" if options[:compileopts]
+      exit unless system compilation_params
       
       exec_params = app_filename
       exec_params = "./#{exec_params}" unless WINDOWS
