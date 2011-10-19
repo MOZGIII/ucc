@@ -84,7 +84,7 @@ module Ucc
       compilation_params = "#{compilation_params} #{options[:compileopts]}" if options[:compileopts]
       exit unless system compilation_params
       
-      exec_params = app_filename
+      exec_params = %Q["#{app_filename}"]
       exec_params = "./#{exec_params}" unless WINDOWS
       exec_params = "#{exec_params} #{options[:runopts]}" if options[:runopts]
       exec_params = "valgrind #{exec_params}" if options[:memcheck]
