@@ -100,7 +100,7 @@ module Ucc
     
     # Everything special goes here
     def work
-      compilation_params = %Q[#{@compiler} #{options[:compileopts]} -Wall -o "#{app_filename}" #{source_files.map{ |f| enquote(f) }.join(" ")}]
+      compilation_params = %Q[#{@compiler} #{options[:compileopts]} -Wall -o #{enquote(app_filename)} #{source_files.map{ |f| enquote(f) }.join(" ")}]
       trace compilation_params
       exit unless system compilation_params
       
@@ -109,7 +109,7 @@ module Ucc
       exec_params = "#{exec_params} #{options[:runopts]}" if options[:runopts]
       exec_params = "valgrind #{exec_params}" if options[:memcheck]
       trace exec_params
-      puts "=== Compiled successfully, executing... === "
+      puts "=== Compiled successfully, executing... ==="
       exec exec_params
     end
     
