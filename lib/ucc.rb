@@ -11,7 +11,7 @@ module Ucc
   class Runner
     attr_reader :source_files
     
-    # Herewe pass the compiler (to be able to choose between gcc or g++)
+    # Here we pass the compiler (to be able to choose between gcc or g++)
     def initialize(compiler)
       @compiler = compiler
       raise "Compiler must be specified" unless @compiler
@@ -74,7 +74,7 @@ module Ucc
     # Main logic
     # ==========
     
-    # Does option parsing using `optparse`
+    # Does option parsing using optparse
     def parse_options
       begin
         optparse.parse!
