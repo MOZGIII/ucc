@@ -69,6 +69,7 @@ module Ucc
       return @app_filename if @app_filename
       @app_filename = source_files[0].sub(/\.\w+$/, '')
       @app_filename += ".exe" if WINDOWS
+      @app_filename
     end
     
     # Main logic
