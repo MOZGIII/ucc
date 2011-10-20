@@ -94,8 +94,7 @@ module Ucc
     
     # Everything special goes here
     def work
-      compilation_params = %Q[#{@compiler} -Wall -o "#{app_filename}" #{source_files.map{ |f| enquote(f) }.join(" ")}]
-      compilation_params = "#{compilation_params} #{options[:compileopts]}" if options[:compileopts]
+      compilation_params = %Q[#{@compiler} -Wall #{options[:compileopts]} -o "#{app_filename}" #{source_files.map{ |f| enquote(f) }.join(" ")}]
       trace compilation_params
       exit unless system compilation_params
       
