@@ -28,13 +28,17 @@ module Ucc
         opts.banner = "Usage: #{CURRENT_EXECUTABLE} [options] file..."
         
         options[:runopts] = nil
-        opts.on( '-r', '--runopts "STRING"', 'Pass STRING as the command line argument to the compiled app' ) do |s|
+        opts.on( '-r', '--runopts STRING', 'Pass STRING as the command line argument to the compiled app' ) do |s|
           options[:runopts] = s
         end
         
         options[:compileopts] = nil
-        opts.on( '-c', '--compileopts "STRING"', 'Pass STRING as the command line argument to the compiler' ) do |s|
+        opts.on( '-c', '--compileopts STRING', 'Pass STRING as the command line argument to the compiler' ) do |s|
           options[:compileopts] = s
+        end
+        
+        opts.on( '-o', '--output FILE', 'Use FILE as the output file' ) do |s|
+          @app_filename = s
         end
         
         options[:memcheck] = false
@@ -67,7 +71,9 @@ module Ucc
     # Filename to use when executing compiled app
     def app_filename
       return @app_filename if @app_filename
-      @app_filename = source_files[0].sub(/\.\w+$/, '')
+      @app_filename = source_files.find{ |param| param !~ /^-/ }      
+      return nil unless @app_filename
+      @app_filename = @app_filename.sub(/\.\w+$/, '')
       @app_filename += ".exe" if WINDOWS
       @app_filename
     end
@@ -84,9 +90,9 @@ module Ucc
         exit(1)
       end      
       
-      # Here we have already parsed ARGV
+      # Here we have already clean ARGV
       @source_files = ARGV
-      if @source_files.empty?
+      unless app_filename
         puts "#{CURRENT_EXECUTABLE}: no input files"
         exit(1)
       end
@@ -94,7 +100,7 @@ module Ucc
     
     # Everything special goes here
     def work
-      compilation_params = %Q[#{@compiler} -Wall #{options[:compileopts]} -o "#{app_filename}" #{source_files.map{ |f| enquote(f) }.join(" ")}]
+      compilation_params = %Q[#{@compiler} #{options[:compileopts]} -Wall -o "#{app_filename}" #{source_files.map{ |f| enquote(f) }.join(" ")}]
       trace compilation_params
       exit unless system compilation_params
       
